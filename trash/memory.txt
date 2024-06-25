@@ -1,0 +1,2 @@
+logo color = #127d7e
+logo background = #95dfdc
