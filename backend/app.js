@@ -327,6 +327,39 @@ app.get("/userdetails", authenticateToken, async (req, res) => {
         res.status(500).send("An error occurred");
     }
 });
+// Delete profile endpoint
+app.delete("/deleteprofile", authenticateToken, async (req, res) => {
+    const userId = req.user.userId;
+    const { password } = req.body;
+  
+    try {
+      if (!password) {
+        return res.status(400).send("Please provide your password for verification");
+      }
+  
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).send("User not found");
+      }
+  
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(400).send("Password verification failed. Please provide the correct password.");
+      }
+  
+      // Delete the user from the database
+      await User.findByIdAndDelete(userId);
+  
+      // Clear the token
+      res.clearCookie('token');
+  
+      res.status(200).send("Profile deleted successfully");
+    } catch (error) {
+      console.error(error);
+      res.status(500).send("An error occurred");
+    }
+  });
+
 
 app.post('/add', async (req, res) => {
     try {
